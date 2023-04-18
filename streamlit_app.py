@@ -1,6 +1,9 @@
 import pandas as pd
 import streamlit as st
 
+st.title("My first Streamlit app")
+st.write("Streamlit is fun")
+
 #Load data and add headers
 airlines = pd.read_csv('airlines.dat', header=None)
 airline_col = ['Airline ID', 'Name', 'Alias', 'IATA', 'ICAO', 'Callsign', 'Country', 'Active']
@@ -22,4 +25,4 @@ routes = pd.read_csv('routes.dat', header=None)
 route_col = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'Destination airport', 'Destination airport ID', 'Codeshare', 'Stops', 'Equipment']
 routes.columns = route_col
 
-print(routes)
+
