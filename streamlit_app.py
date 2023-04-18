@@ -1,38 +1,23 @@
-from collections import namedtuple
-import altair as alt
-import math
 import pandas as pd
 import streamlit as st
 
-"""
-# Welcome to Streamlit!
+#Load data and add headers
+airlines = pd.read_csv('airlines.dat', header=None)
+airline_col = ['Airline ID', 'Name', 'Alias', 'IATA', 'ICAO', 'Callsign', 'Country', 'Active']
+airlines.columns = airline_col
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
+airports = pd.read_csv('airports.dat', header=None)
+airport_col = ['Airport ID', 'Name', 'City', 'Country', 'IATA', 'ICAO', 'Latitude', 'Longitude', 'Altitude', 'Timezone', 'DST', 'Tz database time zone', 'Type', 'Source']
+airports.columns = airport_col
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+countries = pd.read_csv('countries.dat', header=None)
+country_col = ['Name', 'ISO Code', 'DAFIF Code']
+countries.columns = country_col
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+planes = pd.read_csv('planes.dat', header=None)
+plane_col = ['Name', 'IATA code', 'ICAO code']
+planes.columns = plane_col
 
-
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
-
-    Point = namedtuple('Point', 'x y')
-    data = []
-
-    points_per_turn = total_points / num_turns
-
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
-
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+routes = pd.read_csv('routes.dat', header=None)
+route_col = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'Destination airport', 'Destination airport ID', 'Codeshare', 'Stops', 'Equipment']
+routes.columns = route_col
