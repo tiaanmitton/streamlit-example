@@ -7,7 +7,7 @@ from math import radians, cos, sin, asin, sqrt
 
 
 
-st.title("My first Streamlit app")
+st.title("u19096667 Tiaan Mitton Dashboard")
 
 #Load data and add headers
 airlines = pd.read_csv('airlines.dat', header=None)
@@ -30,7 +30,7 @@ routes = pd.read_csv('routes.dat', header=None)
 route_col = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'Destination airport', 'Destination airport ID', 'Codeshare', 'Stops', 'Equipment']
 routes.columns = route_col
 
-st.write("My map")
+st.write("Flight time calculator:")
 
 
 # create a map centered on Africa
