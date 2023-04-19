@@ -93,11 +93,12 @@ def update_flight_path_visibility():
     else:
         flight_path.remove_from(m)
 
-# add slider for flight time
-flight_time_slider = st.slider('Flight time (hours)', 0.0, 24.0, flight_time, 0.1)
 
 # function to update flight time
 def update_flight_time():
+    # add slider for flight time
+    flight_time_slider = st.slider('Flight time (hours)', 0.0, 24.0, flight_time, 0.1)
+
     flight_path.attributes['text'] = str(flight_time_slider.value)
     update_flight_path_visibility()
 
