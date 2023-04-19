@@ -79,15 +79,21 @@ distance = haversine(start_airport_lat, start_airport_lon, end_airport_lat, end_
 speed = 800 # average speed of a commercial airliner in km/h
 flight_time = distance / speed
 
+# add curved line to show flight path with flight time text
+import folium.plugins as plugins
+
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-flight_path = folium.PolyLine(
-    locations=coords,
-    color='blue',
-    weight=3,
-    opacity=0.7,
-    smooth_factor=1,
-    popup=f"Flight distance: {distance:.2f} km<br>Flight time: {flight_time:.2f} hours"
+flight_path = plugins.PolyLineTextPath(
+    positions=coords,
+    text=str(flight_time),
+    offset=8,
+    repeat=True,
+    attributes={
+        'fill': 'blue',
+        'font-weight': 'bold',
+        'font-size': '16'
+    }
 ).add_to(m)
 
 st.write(f"Flight distance: {distance:.2f} km")
