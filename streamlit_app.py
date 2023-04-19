@@ -3,7 +3,7 @@ import folium
 from folium.plugins import MeasureControl
 import streamlit as st
 
-pip install branca==0.3.1
+#pip install branca==0.3.1
 
 st.title("My first Streamlit app")
 st.write("Streamlit is fun")
