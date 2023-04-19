@@ -1,6 +1,7 @@
 
 import pandas as pd
 import folium
+from folium.plugins import FloatImage
 from folium.plugins import MeasureControl
 import streamlit as st
 from streamlit_folium import folium_static
@@ -63,31 +64,41 @@ end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
 start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
 end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
+
+
+# create feature group for markers
+marker_group = folium.FeatureGroup(name='Airports')
+
 folium.Marker(
     location=[start_airport_lat, start_airport_lon],
     icon=folium.Icon(color='green'),
     tooltip=start_airport
-).add_to(m)
+).add_to(marker_group)
 
 folium.Marker(
     location=[end_airport_lat, end_airport_lon],
     icon=folium.Icon(color='red'),
     tooltip=end_airport
-).add_to(m)
+).add_to(marker_group)
 
-# add legend to the map
+# add feature group to the map
+marker_group.add_to(m)
+
+# create legend
 legend_html = """
      <div style="position: fixed; 
                  bottom: 50px; left: 50px; width: 150px; height: 90px; 
                  border:2px solid grey; z-index:9999; font-size:14px;
-                 ">&nbsp; Departure: <i class="fa fa-map-marker fa-2x" style="color:green"></i><br>
-                 &nbsp; {}<br>
-                 &nbsp; Destination: <i class="fa fa-map-marker fa-2x" style="color:red"></i><br>
-                 &nbsp; {}<br>
-     </div>
-     """.format(start_airport, end_airport)
+                 ">&nbsp; <b>Legend</b>
+                  <br>&nbsp; Departure Airport &nbsp; <i class="fa fa-map-marker fa-2x" style="color:green"></i>
+                  <br>&nbsp; Destination Airport &nbsp; <i class="fa fa-map-marker fa-2x" style="color:red"></i>
+    </div>
+"""
 
 m.get_root().html.add_child(folium.Element(legend_html))
+
+
+
 
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
