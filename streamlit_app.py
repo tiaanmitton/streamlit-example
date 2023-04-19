@@ -6,7 +6,7 @@ import streamlit as st
 from streamlit_folium import folium_static
 from math import radians, cos, sin, asin, sqrt
 
-import streamlit as st
+
 
 def local_css(file_name):
     with open(file_name) as f:
@@ -22,7 +22,7 @@ def local_css(file_name):
     </style>
 """, unsafe_allow_html=True)
 
-local_css('style.css')
+
 
 
 
@@ -103,3 +103,5 @@ st.write(f"Flight time: {flight_time:.2f} hours")
 
 # display the map
 folium_static(m)
+
+local_css('style.css')
