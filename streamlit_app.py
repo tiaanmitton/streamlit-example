@@ -6,6 +6,10 @@ from streamlit_folium import folium_static
 from math import radians, cos, sin, asin, sqrt
 
 
+from folium.plugins import BeautifulBezier
+from geopy.distance import geodesic
+
+
 
 st.title("My first Streamlit app")
 st.write("Streamlit is fun")
@@ -38,6 +42,11 @@ st.write("My map")
 
 
 
+
+
+# load airports data
+airports = pd.read_csv('airports.csv')
+
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
@@ -57,33 +66,24 @@ folium.Marker(
     icon=folium.Icon(color='red')
 ).add_to(m)
 
-# add curved line to show flight path
-coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-flight_path = folium.PolyLine(
-    locations=coords,
-    color='blue',
-    weight=3,
-    opacity=0.7,
-    smooth_factor=1
+# calculate flight time
+start = (start_airport_lat, start_airport_lon)
+end = (end_airport_lat, end_airport_lon)
+distance = geodesic(start, end).km
+flight_time = distance / 800
+
+# add curved line between the start and end airports
+bezier = BeautifulBezier(
+    start_point=(start_airport_lat, start_airport_lon),
+    end_point=(end_airport_lat, end_airport_lon),
+    n=300,
+    weight=5,
+    color='#1e88e5'
 ).add_to(m)
 
-# calculate flight time
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6372.8 # Earth radius in kilometers
-    dLat = radians(lat2 - lat1)
-    dLon = radians(lon2 - lon1)
-    lat1 = radians(lat1)
-    lat2 = radians(lat2)
-    a = sin(dLat/2)**2 + cos(lat1)*cos(lat2)*sin(dLon/2)**2
-    c = 2*asin(sqrt(a))
-    return R * c
-
-distance = haversine(start_airport_lat, start_airport_lon, end_airport_lat, end_airport_lon)
-speed = 800 # average speed of a commercial airliner in km/h
-flight_time = distance / speed
-
-st.write(f"Flight distance: {distance:.2f} km")
-st.write(f"Flight time: {flight_time:.2f} hours")
+# display flight time
+st.write(f'Flight distance: {distance:.2f} km')
+st.write(f'Flight time: {flight_time:.2f} hours')
 
 # display the map
 folium_static(m)
