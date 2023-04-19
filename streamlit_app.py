@@ -48,8 +48,9 @@ start_airport = st.multiselect('Select a Departure Airport', sorted(airport_name
 end_airport = st.multiselect('Select a Destination Airport', sorted(airport_names), search=True)
 
 
-start_airport_data = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']]
-end_airport_data = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']]
+start_airport_data = airports[airports['Name'].isin(start_airport)][['Latitude', 'Longitude']]
+end_airport_data = airports[airports['Name'].isin(end_airport)][['Latitude', 'Longitude']]
+
 start_airport_lat, start_airport_lon = start_airport_data.iloc[0]['Latitude'], start_airport_data.iloc[0]['Longitude']
 end_airport_lat, end_airport_lon = end_airport_data.iloc[0]['Latitude'], end_airport_data.iloc[0]['Longitude']
 
