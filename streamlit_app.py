@@ -59,5 +59,13 @@ folium.Marker(
     icon=folium.Icon(color='red')
 ).add_to(m)
 
+# add flight line between start and end airports
+flight_line = folium.PolyLine(
+    locations=[[start_airport_lat, start_airport_lon], [end_airport_lat, end_airport_lon]],
+    weight=3,
+    color='blue'
+).add_to(m)
+
+
 # display the map
 folium_static(m)
