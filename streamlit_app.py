@@ -64,6 +64,9 @@ flight_path = folium.PolyLine(
     smooth_factor=1
 ).add_to(m)
 
+# create toggle for flight path
+flight_path_toggle = st.checkbox('Show flight path')
+
 # calculate flight time
 def haversine(lat1, lon1, lat2, lon2):
     R = 6372.8 # Earth radius in kilometers
@@ -82,8 +85,7 @@ flight_time = distance / speed
 st.write(f"Flight distance: {distance:.2f} km")
 st.write(f"Flight time: {flight_time:.2f} hours")
 
-# create toggle for flight path
-flight_path_toggle = st.checkbox('Show flight path')
+
 # add callback to update flight path visibility and flight time when toggle and slider are changed
 flight_path_toggle.add_callback(update_flight_path_visibility)
 flight_time_slider.add_callback(update_flight_time)
