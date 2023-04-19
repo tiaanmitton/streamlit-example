@@ -37,7 +37,7 @@ st.write("My map")
 import streamlit as st
 import pandas as pd
 import folium
-from streamlit-folium import folium-static
+from streamlit_folium import folium_static
 
 
 # create a map centered on Africa
