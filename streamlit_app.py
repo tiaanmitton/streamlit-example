@@ -36,32 +36,22 @@ routes.columns = route_col
 st.write("Flight time calculator:")
 
 
-
-
-
-
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
-# Add a dropdown to select map tiles
-tile_layers = {
-    "OpenStreetMap": folium.TileLayer(),
-    "Stamen Terrain": folium.TileLayer(name="Stamen Terrain", tiles="Stamen Terrain"),
-    "Stamen Toner": folium.TileLayer(name="Stamen Toner", tiles="Stamen Toner"),
-    "Stamen Watercolor": folium.TileLayer(name="Stamen Watercolor", tiles="Stamen Watercolor"),
-}
-
-select_layer = st.selectbox("Select a map style", list(tile_layers.keys()))
-
-# Set the selected layer as the active layer
-tile_layers[select_layer].add_to(m)
-
-
 # add start and end airport markers to the map
-start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
-end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
-start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
-end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
+airport_names = airports['Name'].tolist()
+#start_airport = st.selectbox('Select a Departure Airport', sorted(airport_names))
+#end_airport = st.selectbox('Select a Destination Airport', sorted(airport_names))
+
+start_airport = st.multiselect('Select a Departure Airport', sorted(airport_names), search=True)
+end_airport = st.multiselect('Select a Destination Airport', sorted(airport_names), search=True)
+
+
+start_airport_data = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']]
+end_airport_data = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']]
+start_airport_lat, start_airport_lon = start_airport_data.iloc[0]['Latitude'], start_airport_data.iloc[0]['Longitude']
+end_airport_lat, end_airport_lon = end_airport_data.iloc[0]['Latitude'], end_airport_data.iloc[0]['Longitude']
 
 folium.Marker(
     location=[start_airport_lat, start_airport_lon],
@@ -103,8 +93,11 @@ flight_time = distance / speed
 st.write(f"Flight distance: {distance:.2f} km")
 st.write(f"Flight time: {flight_time:.2f} hours")
 
+
 # display the map
 folium_static(m)
+
+
 
 
 
