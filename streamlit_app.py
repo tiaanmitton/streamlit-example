@@ -34,36 +34,30 @@ st.write("My map")
 
 
 
-# Create a map centered over Africa with a border
-m = folium.Map(location=[8, 20], tiles='Stamen Terrain', width=500, height=500, zoom_start=3, control_scale=True)
+import streamlit as st
+import pandas as pd
+import folium
+from streamlit_folium import folium_static
 
-# Create a dropdown menu for selecting the start airport
-start_airport = st.selectbox('Start airport:', airports['Name'].tolist())
 
-# Create a dropdown menu for selecting the end airport
-end_airport = st.selectbox('End airport:', airports['Name'].tolist())
+# create a map centered on Africa
+m = folium.Map(location=[0, 20], zoom_start=2)
 
-# Get the latitude and longitude of the start airport
-start_airport_data = airports.loc[airports['Name'] == start_airport]
-start_latitude = start_airport_data['Latitude'].values[0]
-start_longitude = start_airport_data['Longitude'].values[0]
+# add start and end airport markers to the map
+start_airport = st.selectbox('Select a start airport', airports['Name'])
+end_airport = st.selectbox('Select an end airport', airports['Name'])
+start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
-# Add a marker for the start airport
-folium.Marker(location=[start_latitude, start_longitude], popup=start_airport, icon=folium.Icon(color='green')).add_to(m)
+folium.Marker(
+    location=[start_airport_lat, start_airport_lon],
+    icon=folium.Icon(color='green')
+).add_to(m)
 
-# Get the latitude and longitude of the end airport
-end_airport_data = airports.loc[airports['Name'] == end_airport]
-end_latitude = end_airport_data['Latitude'].values[0]
-end_longitude = end_airport_data['Longitude'].values[0]
+folium.Marker(
+    location=[end_airport_lat, end_airport_lon],
+    icon=folium.Icon(color='red')
+).add_to(m)
 
-# Add a marker for the end airport
-folium.Marker(location=[end_latitude, end_longitude], popup=end_airport, icon=folium.Icon(color='red')).add_to(m)
-
-# Add a polyline between the start and end airports
-folium.PolyLine(locations=[[start_latitude, start_longitude], [end_latitude, end_longitude]], color='red').add_to(m)
-
-# Add a scale control to the map
-m.add_child(MeasureControl())
-
-# Display the map
-st.markdown(m._repr_html_(), unsafe_allow_html=True)
+# display the map
+folium_static(m)
