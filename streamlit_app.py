@@ -2,6 +2,9 @@ import pandas as pd
 import folium
 from folium.plugins import MeasureControl
 import streamlit as st
+from streamlit_folium import folium_static
+from math import radians, cos, sin, asin, sqrt
+
 
 
 st.title("My first Streamlit app")
@@ -34,11 +37,6 @@ st.write("My map")
 
 
 
-import streamlit as st
-import pandas as pd
-import folium
-from streamlit_folium import folium_static
-from math import radians, cos, sin, asin, sqrt
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
