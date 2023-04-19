@@ -38,24 +38,20 @@ st.write("Flight time calculator:")
 
 
 
-
-
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
-# Add a dropdown to select map tiles
+# Add radio buttons to select map tiles
 tile_layers = {
     "OpenStreetMap": folium.TileLayer(),
     "Stamen Terrain": folium.TileLayer(name="Stamen Terrain", tiles="Stamen Terrain"),
     "Stamen Toner": folium.TileLayer(name="Stamen Toner", tiles="Stamen Toner"),
     "Stamen Watercolor": folium.TileLayer(name="Stamen Watercolor", tiles="Stamen Watercolor"),
 }
-
-select_layer = st.selectbox("Select a map style", list(tile_layers.keys()))
+map_style = st.sidebar.radio("Select a map style", list(tile_layers.keys()), index=0)
 
 # Set the selected layer as the active layer
-tile_layers[select_layer].add_to(m)
-
+tile_layers[map_style].add_to(m)
 
 # add start and end airport markers to the map
 start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
