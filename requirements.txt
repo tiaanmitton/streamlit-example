@@ -4,4 +4,3 @@ streamlit
 folium
 branca
 streamlit-folium
-math
