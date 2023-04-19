@@ -52,18 +52,17 @@ folium.Marker(
     icon=folium.Icon(color='red')
 ).add_to(m)
 
+
+).add_to(m)
+
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-flight_path = folium.plugins.PolyLineTextPath(
-    positions=coords,
-    text='',
-    offset=8,
-    repeat=True,
-    attributes={
-        'fill': 'blue',
-        'font-weight': 'bold',
-        'font-size': '16'
-    }
+flight_path = folium.PolyLine(
+    locations=coords,
+    color='blue',
+    weight=3,
+    opacity=0.7,
+    smooth_factor=1
 ).add_to(m)
 
 # calculate flight time
