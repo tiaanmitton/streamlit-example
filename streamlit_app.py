@@ -87,18 +87,23 @@ marker_group.add_to(m)
 # create legend
 legend_html = """
      <div style="position: fixed; 
-                 bottom: 50px; left: 50px; width: 150px; height: 90px; 
+                 bottom: 50px; left: 50px; width: 100px; height: 90px; 
                  border:2px solid grey; z-index:9999; font-size:14px;
-                 ">&nbsp; <b>Legend</b>
-                  <br>&nbsp; Departure Airport &nbsp; <i class="fa fa-map-marker fa-2x" style="color:green"></i>
-                  <br>&nbsp; Destination Airport &nbsp; <i class="fa fa-map-marker fa-2x" style="color:red"></i>
-    </div>
-"""
+                 background-color:rgba(255, 255, 255, 0.5);
+                ">
+     &nbsp; <b>Legend</b> <br>
+     &nbsp; Departure Airport &nbsp; <i class="fa fa-map-marker fa-2x"
+                  style="color:green"></i><br>
+     &nbsp; Destination Airport &nbsp; <i class="fa fa-map-marker fa-2x"
+                  style="color:red"></i>
+      </div>
+     """
 
+# add legend to the map
 m.get_root().html.add_child(folium.Element(legend_html))
 
-
-
+# Add layer control to toggle tile layers
+folium.LayerControl().add_to(m)
 
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
