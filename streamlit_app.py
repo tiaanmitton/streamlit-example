@@ -29,42 +29,42 @@ st.write("My map")
 #st.table(airports)
 
 
+import pandas as pd
 import folium
 from folium.plugins import MeasureControl
-from ipywidgets import interact, Dropdown
+import streamlit as st
 
-m = folium.Map(location=[37.7749, -122.4194], zoom_start=3)
+
+# Create a map centered over Africa with a border
+m = folium.Map(location=[8, 20], tiles='Stamen Terrain', width=500, height=500, zoom_start=3, control_scale=True)
 
 # Create a dropdown menu for selecting the start airport
-start_airport_dropdown = Dropdown(options=airports['Name'].tolist(), description='Start airport:')
+start_airport = st.selectbox('Start airport:', airports['Name'].tolist())
 
 # Create a dropdown menu for selecting the end airport
-end_airport_dropdown = Dropdown(options=airports['Name'].tolist(), description='End airport:')
+end_airport = st.selectbox('End airport:', airports['Name'].tolist())
 
-# Function to update the map based on the selected airports
-def update_map(start_airport, end_airport):
-    # Get the latitude and longitude of the start airport
-    start_airport_data = airports.loc[airports['Name'] == start_airport]
-    start_latitude = start_airport_data['Latitude'].values[0]
-    start_longitude = start_airport_data['Longitude'].values[0]
-    
-    # Get the latitude and longitude of the end airport
-    end_airport_data = airports.loc[airports['Name'] == end_airport]
-    end_latitude = end_airport_data['Latitude'].values[0]
-    end_longitude = end_airport_data['Longitude'].values[0]
-    
-    # Add a polyline between the start and end airports
-    folium.PolyLine(locations=[[start_latitude, start_longitude], [end_latitude, end_longitude]], color='red').add_to(m)
+# Get the latitude and longitude of the start airport
+start_airport_data = airports.loc[airports['Name'] == start_airport]
+start_latitude = start_airport_data['Latitude'].values[0]
+start_longitude = start_airport_data['Longitude'].values[0]
 
-# Add the dropdown menus to the map
-start_airport_dropdown.observe(lambda change: update_map(change.new, end_airport_dropdown.value), names='value')
-end_airport_dropdown.observe(lambda change: update_map(start_airport_dropdown.value, change.new), names='value')
+# Add a marker for the start airport
+folium.Marker(location=[start_latitude, start_longitude], popup=start_airport, icon=folium.Icon(color='green')).add_to(m)
+
+# Get the latitude and longitude of the end airport
+end_airport_data = airports.loc[airports['Name'] == end_airport]
+end_latitude = end_airport_data['Latitude'].values[0]
+end_longitude = end_airport_data['Longitude'].values[0]
+
+# Add a marker for the end airport
+folium.Marker(location=[end_latitude, end_longitude], popup=end_airport, icon=folium.Icon(color='red')).add_to(m)
+
+# Add a polyline between the start and end airports
+folium.PolyLine(locations=[[start_latitude, start_longitude], [end_latitude, end_longitude]], color='red').add_to(m)
 
 # Add a scale control to the map
 m.add_child(MeasureControl())
 
-# Display the map and dropdown menus
-display(start_airport_dropdown)
-display(end_airport_dropdown)
-display(m)
-
+# Display the map
+st.markdown(m._repr_html_(), unsafe_allow_html=True)
