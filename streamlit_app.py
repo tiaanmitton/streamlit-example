@@ -38,7 +38,7 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
-
+from math import radians, cos, sin, asin, sqrt
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
@@ -59,13 +59,33 @@ folium.Marker(
     icon=folium.Icon(color='red')
 ).add_to(m)
 
-# add flight line between start and end airports
-flight_line = folium.PolyLine(
-    locations=[[start_airport_lat, start_airport_lon], [end_airport_lat, end_airport_lon]],
+# add curved line to show flight path
+coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
+flight_path = folium.PolyLine(
+    locations=coords,
+    color='blue',
     weight=3,
-    color='blue'
+    opacity=0.7,
+    smooth_factor=1
 ).add_to(m)
 
+# calculate flight time
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6372.8 # Earth radius in kilometers
+    dLat = radians(lat2 - lat1)
+    dLon = radians(lon2 - lon1)
+    lat1 = radians(lat1)
+    lat2 = radians(lat2)
+    a = sin(dLat/2)**2 + cos(lat1)*cos(lat2)*sin(dLon/2)**2
+    c = 2*asin(sqrt(a))
+    return R * c
+
+distance = haversine(start_airport_lat, start_airport_lon, end_airport_lat, end_airport_lon)
+speed = 800 # average speed of a commercial airliner in km/h
+flight_time = distance / speed
+
+st.write(f"Flight distance: {distance:.2f} km")
+st.write(f"Flight time: {flight_time:.2f} hours")
 
 # display the map
 folium_static(m)
