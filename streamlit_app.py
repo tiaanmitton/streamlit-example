@@ -1,5 +1,8 @@
 import pandas as pd
+import folium
+from folium.plugins import MeasureControl
 import streamlit as st
+
 
 st.title("My first Streamlit app")
 st.write("Streamlit is fun")
@@ -29,10 +32,6 @@ st.write("My map")
 #st.table(airports)
 
 
-import pandas as pd
-import folium
-from folium.plugins import MeasureControl
-import streamlit as st
 
 
 # Create a map centered over Africa with a border
