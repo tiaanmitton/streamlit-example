@@ -36,61 +36,72 @@ routes.columns = route_col
 st.write("Flight time calculator:")
 
 
+
+
+
+
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
+# Add a dropdown to select map tiles
+tile_layers = {
+    "OpenStreetMap": folium.TileLayer(),
+    "Stamen Terrain": folium.TileLayer(name="Stamen Terrain", tiles="Stamen Terrain"),
+    "Stamen Toner": folium.TileLayer(name="Stamen Toner", tiles="Stamen Toner"),
+    "Stamen Watercolor": folium.TileLayer(name="Stamen Watercolor", tiles="Stamen Watercolor"),
+}
+
+select_layer = st.selectbox("Select a map style", list(tile_layers.keys()))
+
+# Set the selected layer as the active layer
+tile_layers[select_layer].add_to(m)
+
+
 # add start and end airport markers to the map
-airport_names = airports['Name'].tolist()
-airport_names.sort()
+start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
+start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
-start_airport = st.multiselect('Select a Departure Airport', airport_names, search=True)
-end_airport = st.multiselect('Select a Destination Airport', airport_names, search=True)
+folium.Marker(
+    location=[start_airport_lat, start_airport_lon],
+    icon=folium.Icon(color='green'),
+    tooltip=start_airport
+).add_to(m)
 
-if start_airport and end_airport:
-    start_airport_data = airports[airports['Name'] == start_airport[0]][['Latitude', 'Longitude']]
-    end_airport_data = airports[airports['Name'] == end_airport[0]][['Latitude', 'Longitude']]
-    start_airport_lat, start_airport_lon = start_airport_data.iloc[0]['Latitude'], start_airport_data.iloc[0]['Longitude']
-    end_airport_lat, end_airport_lon = end_airport_data.iloc[0]['Latitude'], end_airport_data.iloc[0]['Longitude']
+folium.Marker(
+    location=[end_airport_lat, end_airport_lon],
+    icon=folium.Icon(color='red'),
+    tooltip=end_airport
+).add_to(m)
 
-    folium.Marker(
-        location=[start_airport_lat, start_airport_lon],
-        icon=folium.Icon(color='green'),
-        tooltip=start_airport[0]
-    ).add_to(m)
+# add curved line to show flight path
+coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
+flight_path = folium.PolyLine(
+    locations=coords,
+    color='blue',
+    weight=3,
+    opacity=0.7,
+    smooth_factor=1
+).add_to(m)
 
-    folium.Marker(
-        location=[end_airport_lat, end_airport_lon],
-        icon=folium.Icon(color='red'),
-        tooltip=end_airport[0]
-    ).add_to(m)
+# calculate flight time
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6372.8 # Earth radius in kilometers
+    dLat = radians(lat2 - lat1)
+    dLon = radians(lon2 - lon1)
+    lat1 = radians(lat1)
+    lat2 = radians(lat2)
+    a = sin(dLat/2)**2 + cos(lat1)*cos(lat2)*sin(dLon/2)**2
+    c = 2*asin(sqrt(a))
+    return R * c
 
-    # add curved line to show flight path
-    coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-    flight_path = folium.PolyLine(
-        locations=coords,
-        color='blue',
-        weight=3,
-        opacity=0.7,
-        smooth_factor=1
-    ).add_to(m)
+distance = haversine(start_airport_lat, start_airport_lon, end_airport_lat, end_airport_lon)
+speed = 800 # average speed of a commercial airliner in km/h
+flight_time = distance / speed
 
-    # calculate flight time
-    def haversine(lat1, lon1, lat2, lon2):
-        R = 6372.8 # Earth radius in kilometers
-        dLat = radians(lat2 - lat1)
-        dLon = radians(lon2 - lon1)
-        lat1 = radians(lat1)
-        lat2 = radians(lat2)
-        a = sin(dLat/2)**2 + cos(lat1)*cos(lat2)*sin(dLon/2)**2
-        c = 2*asin(sqrt(a))
-        return R * c
-
-    distance = haversine(start_airport_lat, start_airport_lon, end_airport_lat, end_airport_lon)
-    speed = 800 # average speed of a commercial airliner in km/h
-    flight_time = distance / speed
-
-    st.write(f"Flight distance: {distance:.2f} km")
-    st.write(f"Flight time: {flight_time:.2f} hours")
+st.write(f"Flight distance: {distance:.2f} km")
+st.write(f"Flight time: {flight_time:.2f} hours")
 
 # display the map
 folium_static(m)
