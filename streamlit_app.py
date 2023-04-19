@@ -38,6 +38,30 @@ st.write("Flight time calculator:")
 
 
 
+# # create a map centered on Africa
+# m = folium.Map(location=[0, 20], zoom_start=2)
+
+# # Add a dropdown to select map tiles
+# tile_layers = {
+#     "OpenStreetMap": folium.TileLayer(),
+#     "Stamen Terrain": folium.TileLayer(name="Stamen Terrain", tiles="Stamen Terrain"),
+#     "Stamen Toner": folium.TileLayer(name="Stamen Toner", tiles="Stamen Toner"),
+#     "Stamen Watercolor": folium.TileLayer(name="Stamen Watercolor", tiles="Stamen Watercolor"),
+# }
+
+# select_layer = st.selectbox("Select a map style", list(tile_layers.keys()))
+
+# # Set the selected layer as the active layer
+# tile_layers[select_layer].add_to(m)
+
+# # Add sidebar panel for airport selection
+# st.sidebar.subheader("Airport Selection")
+# start_airport = st.sidebar.selectbox('Select a Departure Airport', airports['Name'])
+# end_airport = st.sidebar.selectbox('Select a Destination Airport', airports['Name'])
+# start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+# end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
+
+
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
@@ -49,17 +73,21 @@ tile_layers = {
     "Stamen Watercolor": folium.TileLayer(name="Stamen Watercolor", tiles="Stamen Watercolor"),
 }
 
-select_layer = st.selectbox("Select a map style", list(tile_layers.keys()))
+select_layer = st.sidebar.selectbox("Select a map style", list(tile_layers.keys()))
 
 # Set the selected layer as the active layer
 tile_layers[select_layer].add_to(m)
 
-# Add sidebar panel for airport selection
-st.sidebar.subheader("Airport Selection")
-start_airport = st.sidebar.selectbox('Select a Departure Airport', airports['Name'])
-end_airport = st.sidebar.selectbox('Select a Destination Airport', airports['Name'])
-start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
-end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
+# create a sidebar panel for airport selection
+with st.sidebar:
+    # add start and end airport selectors to the sidebar panel
+    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
+    
+    # get latitude and longitude of start and end airports
+    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
+
 
 folium.Marker(
     location=[start_airport_lat, start_airport_lon],
