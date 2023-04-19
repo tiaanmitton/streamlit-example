@@ -53,7 +53,7 @@ folium.Marker(
 ).add_to(m)
 
 
-).add_to(m)
+
 
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
