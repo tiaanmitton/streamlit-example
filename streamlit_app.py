@@ -34,34 +34,36 @@ st.write("My map")
 
 
 # create a map centered on Africa
-m = folium.Map(location=[0, 20], zoom_start=2)
+m = folium.Map(location=[0, 20], zoom_start=2, tiles='Stamen Toner')
 
 # add start and end airport markers to the map
-start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
-end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
+start_airport = st.selectbox('Select a start airport', airports['Name'])
+end_airport = st.selectbox('Select an end airport', airports['Name'])
 start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
 end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
 folium.Marker(
     location=[start_airport_lat, start_airport_lon],
-    icon=folium.Icon(color='green'),
-    tooltip=start_airport
+    icon=folium.Icon(color='green')
 ).add_to(m)
 
 folium.Marker(
     location=[end_airport_lat, end_airport_lon],
-    icon=folium.Icon(color='red'),
-    tooltip=end_airport
+    icon=folium.Icon(color='red')
 ).add_to(m)
 
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-flight_path = folium.PolyLine(
-    locations=coords,
-    color='blue',
-    weight=3,
-    opacity=0.7,
-    smooth_factor=1
+flight_path = folium.plugins.PolyLineTextPath(
+    positions=coords,
+    text='',
+    offset=8,
+    repeat=True,
+    attributes={
+        'fill': 'blue',
+        'font-weight': 'bold',
+        'font-size': '16'
+    }
 ).add_to(m)
 
 # calculate flight time
@@ -81,6 +83,30 @@ flight_time = distance / speed
 
 st.write(f"Flight distance: {distance:.2f} km")
 st.write(f"Flight time: {flight_time:.2f} hours")
+
+# create toggle for flight path
+flight_path_toggle = st.checkbox('Show flight path')
+
+# function to update flight path visibility
+def update_flight_path_visibility():
+    if flight_path_toggle.checked:
+        flight_path.add_to(m)
+    else:
+        flight_path.remove_from(m)
+
+# add slider for flight time
+flight_time_slider = st.slider('Flight time (hours)', 0.0, 24.0, flight_time, 0.1)
+
+# function to update flight time
+def update_flight_time():
+    flight_path.attributes['text'] = str(flight_time_slider.value)
+    update_flight_path_visibility()
+
+update_flight_time()
+
+# add callback to update flight path visibility and flight time when toggle and slider are changed
+flight_path_toggle.add_callback(update_flight_path_visibility)
+flight_time_slider.add_callback(update_flight_time)
 
 # display the map
 folium_static(m)
