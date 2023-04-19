@@ -10,7 +10,17 @@ import streamlit as st
 
 def local_css(file_name):
     with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        st.markdown("""
+    <style>
+        .title-wrapper {
+            font-family: Arial, sans-serif;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 local_css('style.css')
 
