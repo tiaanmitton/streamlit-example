@@ -8,19 +8,7 @@ from math import radians, cos, sin, asin, sqrt
 
 
 
-def local_css('style.css'):
-    with open('style.css) as f:
-        st.markdown("""
-    <style>
-        .title-wrapper {
-            font-family: Arial, sans-serif;
-            font-size: 36px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 50px;
-        }
-    </style>
-""", unsafe_allow_html=True)
+
 
 
 
@@ -50,6 +38,10 @@ route_col = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'De
 routes.columns = route_col
 
 st.write("Flight time calculator:")
+
+
+
+
 
 
 # create a map centered on Africa
@@ -104,4 +96,3 @@ st.write(f"Flight time: {flight_time:.2f} hours")
 # display the map
 folium_static(m)
 
-local_css('style.css')
