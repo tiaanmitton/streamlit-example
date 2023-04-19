@@ -8,7 +8,6 @@ from math import radians, cos, sin, asin, sqrt
 
 
 st.title("My first Streamlit app")
-st.write("Streamlit is fun")
 
 #Load data and add headers
 airlines = pd.read_csv('airlines.dat', header=None)
@@ -32,15 +31,14 @@ route_col = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'De
 routes.columns = route_col
 
 st.write("My map")
-#st.table(airports)
 
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
 # add start and end airport markers to the map
-start_airport = st.selectbox('Select a start airport', airports['Name'])
-end_airport = st.selectbox('Select an end airport', airports['Name'])
+start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
 start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
 end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
