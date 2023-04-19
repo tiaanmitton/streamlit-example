@@ -35,6 +35,18 @@ st.write("My map")
 #st.table(airports)
 
 
+import streamlit as st
+import folium
+from folium.plugins import PolyLineTextPath
+from math import radians, sin, cos, sqrt
+
+# load data
+airports = pd.read_csv('https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat', header=None,
+                       names=['Airport ID', 'Name', 'City', 'Country', 'IATA', 'ICAO', 'Latitude', 'Longitude', 'Altitude',
+                              'Timezone', 'DST', 'Tz database time zone', 'Type', 'Source'])
+airports = airports[['Name', 'Latitude', 'Longitude']]
+airports = airports.dropna()
+
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
@@ -54,16 +66,6 @@ folium.Marker(
     icon=folium.Icon(color='red')
 ).add_to(m)
 
-# # add curved line to show flight path
-# coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-# flight_path = folium.PolyLine(
-#     locations=coords,
-#     color='blue',
-#     weight=3,
-#     opacity=0.7,
-#     smooth_factor=1
-# ).add_to(m)
-
 # calculate flight time
 def haversine(lat1, lon1, lat2, lon2):
     R = 6372.8 # Earth radius in kilometers
@@ -76,28 +78,32 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 distance = haversine(start_airport_lat, start_airport_lon, end_airport_lat, end_airport_lon)
-speed = 800 # average speed of a commercial airliner in km/h
-flight_time = distance / speed
 
 # add curved line to show flight path with flight time text
-import folium.plugins as plugins
+def add_flight_path(speed):
+    flight_time = distance / speed
 
-# add curved line to show flight path
-coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-flight_path = plugins.PolyLineTextPath(
-    positions=coords,
-    text=str(flight_time),
-    offset=8,
-    repeat=True,
-    attributes={
-        'fill': 'blue',
-        'font-weight': 'bold',
-        'font-size': '16'
-    }
-).add_to(m)
+    # remove previous flight path if it exists
+    for layer in m._children.values():
+        if hasattr(layer, '_leaflet_id') and layer._leaflet_id.startswith('plugins.PolyLineTextPath'):
+            m.remove_layer(layer)
 
-st.write(f"Flight distance: {distance:.2f} km")
-st.write(f"Flight time: {flight_time:.2f} hours")
+    # add curved line to show flight path with flight time text
+    coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
+    flight_path = PolyLineTextPath(
+        positions=coords,
+        text=f"Flight time: {flight_time:.2f} hours",
+        offset=8,
+        repeat=True,
+        attributes={
+            'fill': 'blue',
+            'font-weight': 'bold',
+            'font-size': '16'
+        }
+    ).add_to(m)
 
-# display the map
-folium_static(m)
+    st.write(f"Flight distance: {distance:.2f} km")
+    st.write(f"Flight time: {flight_time:.2f} hours")
+
+# add slider to select flight speed
+speed = st.slider('Select flight speed (km/h)', min_value=500, max_value=
