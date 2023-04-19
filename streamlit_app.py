@@ -8,8 +8,8 @@ from math import radians, cos, sin, asin, sqrt
 
 
 
-def local_css(file_name):
-    with open(file_name) as f:
+def local_css('style.css'):
+    with open('style.css) as f:
         st.markdown("""
     <style>
         .title-wrapper {
