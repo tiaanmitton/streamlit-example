@@ -75,6 +75,20 @@ folium.Marker(
     tooltip=end_airport
 ).add_to(m)
 
+# add legend to the map
+legend_html = """
+     <div style="position: fixed; 
+                 bottom: 50px; left: 50px; width: 150px; height: 90px; 
+                 border:2px solid grey; z-index:9999; font-size:14px;
+                 ">&nbsp; Departure: <i class="fa fa-map-marker fa-2x" style="color:green"></i><br>
+                 &nbsp; {}<br>
+                 &nbsp; Destination: <i class="fa fa-map-marker fa-2x" style="color:red"></i><br>
+                 &nbsp; {}<br>
+     </div>
+     """.format(start_airport, end_airport)
+
+m.get_root().html.add_child(folium.Element(legend_html))
+
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
 flight_path = folium.PolyLine(
