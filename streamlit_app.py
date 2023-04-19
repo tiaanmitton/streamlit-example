@@ -94,7 +94,3 @@ if start_airport and end_airport:
 
 # display the map
 folium_static(m)
-
-
-
-
