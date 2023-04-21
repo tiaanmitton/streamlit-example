@@ -64,26 +64,6 @@ routes = join.dropna()
 
 import geopy.distance
 
-# create a sidebar panel for airport selection
-with st.sidebar:
-    # add start and end airport selectors to the sidebar panel
-    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
-    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
-    
-    # get latitude and longitude of start and end airports
-    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
-    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
-
-    # calculate distance between the two airports
-    distance = geopy.distance.distance((start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)).km
-    st.write(f"Distance between {start_airport} and {end_airport}: {distance:.2f} km")
-
-    # check if there is a route between the two airports
-    if distance < 20000: # adjust this threshold as needed
-        st.write("There is a route between the two airports.")
-    else:
-        st.write("There is no route between the two airports.")
-
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
@@ -100,6 +80,15 @@ select_layer = st.sidebar.selectbox("Select a map style", list(tile_layers.keys(
 # Set the selected layer as the active layer
 tile_layers[select_layer].add_to(m)
 
+# create a sidebar panel for airport selection
+with st.sidebar:
+    # add start and end airport selectors to the sidebar panel
+    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
+    
+    # get latitude and longitude of start and end airports
+    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
 
 folium.Marker(
@@ -113,10 +102,6 @@ folium.Marker(
     icon=folium.Icon(color='red'),
     tooltip=end_airport
 ).add_to(m)
-
-
-
-
 
 # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
@@ -146,9 +131,8 @@ flight_time = distance / speed
 st.write(f"Flight distance: {distance:.2f} km")
 st.write(f"Flight time: {flight_time:.2f} hours")
 
-
-folium_static(m)
-
+# display the map
+folium_static(m) here is the code
 
 
 
