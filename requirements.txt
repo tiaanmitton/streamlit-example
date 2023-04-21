@@ -7,4 +7,3 @@ streamlit-folium
 matplotlib
 geopy
 plotly
-elevations
