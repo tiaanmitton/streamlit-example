@@ -1,43 +1,15 @@
 
+#try later
 import pandas as pd
 import folium
+from folium.plugins import HeatMap
+from folium.plugins import HeatMapWithTime
+from folium.plugins import MarkerCluster
 from folium.plugins import MeasureControl
-import streamlit as st
-from streamlit_folium import folium_static
-from math import radians, cos, sin, asin, sqrt
-import matplotlib.pyplot as plt
-
-
-
-
-st.title("u19096667 Tiaan Mitton Dashboard")
-
-#Load data and add headers
-airlines = pd.read_csv('airlines.dat', header=None)
-airline_col = ['Airline ID', 'Name', 'Alias', 'IATA', 'ICAO', 'Callsign', 'Country', 'Active']
-airlines.columns = airline_col
-
-airports = pd.read_csv('airports.dat', header=None)
-airport_col = ['Airport ID', 'Name', 'City', 'Country', 'IATA', 'ICAO', 'Latitude', 'Longitude', 'Altitude', 'Timezone', 'DST', 'Tz database time zone', 'Type', 'Source']
-airports.columns = airport_col
-
-countries = pd.read_csv('countries.dat', header=None)
-country_col = ['Name', 'ISO Code', 'DAFIF Code']
-countries.columns = country_col
-
-planes = pd.read_csv('planes.dat', header=None)
-plane_col = ['Name', 'IATA code', 'ICAO code']
-planes.columns = plane_col
-
-routes = pd.read_csv('routes.dat', header=None)
-route_col = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'Destination airport', 'Destination airport ID', 'Codeshare', 'Stops', 'Equipment']
-routes.columns = route_col
-
-st.write("Flight time calculator:")
-
-
-
-
+from folium.plugins import Fullscreen
+from folium import Marker
+from folium import PolyLine
+from math import radians, cos, sin, sqrt, atan2
 
 # Convert the Airport ID's to string for the join
 airports['Airport ID'] = airports['Airport ID'].astype(str)
@@ -63,27 +35,6 @@ join['Destination Longitude'] = join['Destination Longitude'].dropna().astype(fl
 # Load the joined table
 routes = join.dropna()
 
-import geopy.distance
-
-# create a sidebar panel for airport selection
-with st.sidebar:
-    # add start and end airport selectors to the sidebar panel
-    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
-    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
-    
-    # get latitude and longitude of start and end airports
-    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
-    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
-
-    # calculate distance between the two airports
-    distance = geopy.distance.distance((start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)).km
-    st.write(f"Distance between {start_airport} and {end_airport}: {distance:.2f} km")
-
-    # check if there is a route between the two airports
-    if distance < 20000: # adjust this threshold as needed
-        st.write("There is a route between the two airports.")
-    else:
-        st.write("There is no route between the two airports.")
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
@@ -101,33 +52,69 @@ select_layer = st.sidebar.selectbox("Select a map style", list(tile_layers.keys(
 # Set the selected layer as the active layer
 tile_layers[select_layer].add_to(m)
 
+# create a sidebar panel for airport selection
+with st.sidebar:
+    # add start and end airport selectors to the sidebar panel
+    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
+    
+    # get latitude and longitude of start and end airports
+    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
+# check if there is a route between the two airports
+route = routes[(routes['Source airport'] == start_airport) & (routes['Destination airport'] == end_airport)]
 
-folium.Marker(
-    location=[start_airport_lat, start_airport_lon],
-    icon=folium.Icon(color='green'),
-    tooltip=start_airport
-).add_to(m)
+if len(route) > 0:
+    # get airline ID and number of stops
+    airline_id = route['Airline ID'].iloc[0]
+    stops = route['Stops'].iloc[0]
 
-folium.Marker(
-    location=[end_airport_lat, end_airport_lon],
-    icon=folium.Icon(color='red'),
-    tooltip=end_airport
-).add_to(m)
+    # add markers for start and end airports
+    folium.Marker(
+        location=[start_airport_lat, start_airport_lon],
+        icon=folium.Icon(color='green'),
+        tooltip=start_airport
+    ).add_to(m)
 
+    folium.Marker(
+        location=[end_airport_lat, end_airport_lon],
+        icon=folium.Icon(color='red'),
+        tooltip=end_airport
+    ).add_to(m)
 
-
-
-
-# add curved line to show flight path
+    # add curved line to show flight path
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-flight_path = folium.PolyLine(
-    locations=coords,
-    color='blue',
-    weight=3,
-    opacity=0.7,
-    smooth_factor=1
-).add_to(m)
+route_exists = False
+
+# check if there is a route between the selected airports
+for route in routes:
+    if route['Source airport'] == start_airport and route['Destination airport'] == end_airport:
+        route_exists = True
+        airline_id = route['Airline ID']
+        num_stops = route['Stops']
+        break
+
+# add route information to the map
+if route_exists:
+    st.write(f"Airline: {airlines[airlines['Airline ID'] == airline_id]['Name'].values[0]}")
+    st.write(f"Number of stops: {num_stops}")
+    flight_path = folium.PolyLine(
+        locations=coords,
+        color='blue',
+        weight=3,
+        opacity=0.7,
+        smooth_factor=1
+    ).add_to(m)
+else:
+    st.write("There is no route between the selected airports")
+    flight_path = folium.PolyLine(
+        locations=coords,
+        color='red',
+        weight=3,
+        opacity=0.7,
+        smooth_factor=1
+    ).add_to(m)
 
 # calculate flight time
 def haversine(lat1, lon1, lat2, lon2):
@@ -147,28 +134,5 @@ flight_time = distance / speed
 st.write(f"Flight distance: {distance:.2f} km")
 st.write(f"Flight time: {flight_time:.2f} hours")
 
-
+# display the map
 folium_static(m)
-
-
-
-
-# # calculate airports per country
-# airports_per_country = airports.groupby('Country')['Name'].count()
-
-# # calculate airports per city
-# airports_per_city = airports.groupby(['Country', 'City'])['Name'].count()
-
-# # create a bar chart showing airports per country
-# fig1, ax1 = plt.subplots()
-# ax1.bar(airports_per_country.index, airports_per_country.values)
-# ax1.set_xticklabels(airports_per_country.index, rotation=90)
-# ax1.set_title('Airports per Country')
-# st.pyplot(fig1)
-
-# # create a bar chart showing airports per city
-# fig2, ax2 = plt.subplots()
-# ax2.bar(airports_per_city.index.get_level_values('City'), airports_per_city.values)
-# ax2.set_xticklabels(airports_per_city.index.get_level_values('City'), rotation=90)
-# ax2.set_title('Airports per City')
-# st.pyplot(fig2)
