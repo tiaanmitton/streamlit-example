@@ -136,22 +136,15 @@ folium_static(m)
 
 
 
-# calculate airports per country
-airports_per_country = airports.groupby('Country')['Name'].count()
+import plotly.express as px
 
-# calculate airports per city
-airports_per_city = airports.groupby(['Country', 'City'])['Name'].count()
+df = join
 
-# create a bar chart showing airports per country
-fig1, ax1 = plt.subplots()
-ax1.bar(airports_per_country.index, airports_per_country.values)
-ax1.set_xticklabels(airports_per_country.index, rotation=90)
-ax1.set_title('Airports per Country')
-st.pyplot(fig1)
+# Create a pie chart
+stop_counts = df['Stops'].value_counts()
+labels = stop_counts.index.tolist()
+values = stop_counts.values.tolist()
+fig = px.pie(values=values, names=labels, title='Percentage of Flights by Number of Stops')
 
-# create a bar chart showing airports per city
-fig2, ax2 = plt.subplots()
-ax2.bar(airports_per_city.index.get_level_values('City'), airports_per_city.values)
-ax2.set_xticklabels(airports_per_city.index.get_level_values('City'), rotation=90)
-ax2.set_title('Airports per City')
-st.pyplot(fig2)
+# Show the chart
+st.plotly_chart(fig)
