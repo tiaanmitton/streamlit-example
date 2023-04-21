@@ -6,3 +6,4 @@ branca
 streamlit-folium
 matplotlib
 geopy
+plotly
