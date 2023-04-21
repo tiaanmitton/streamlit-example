@@ -132,7 +132,7 @@ st.write(f"Flight distance: {distance:.2f} km")
 st.write(f"Flight time: {flight_time:.2f} hours")
 
 # display the map
-folium_static(m) here is the code
+folium_static(m)
 
 
 
