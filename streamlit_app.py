@@ -113,3 +113,24 @@ folium_static(m)
 
 
 
+
+
+# calculate airports per country
+airports_per_country = airports.groupby('Country')['Name'].count()
+
+# calculate airports per city
+airports_per_city = airports.groupby(['Country', 'City'])['Name'].count()
+
+# create a bar chart showing airports per country
+fig1, ax1 = plt.subplots()
+ax1.bar(airports_per_country.index, airports_per_country.values)
+ax1.set_xticklabels(airports_per_country.index, rotation=90)
+ax1.set_title('Airports per Country')
+st.pyplot(fig1)
+
+# create a bar chart showing airports per city
+fig2, ax2 = plt.subplots()
+ax2.bar(airports_per_city.index.get_level_values('City'), airports_per_city.values)
+ax2.set_xticklabels(airports_per_city.index.get_level_values('City'), rotation=90)
+ax2.set_title('Airports per City')
+st.pyplot(fig2)
