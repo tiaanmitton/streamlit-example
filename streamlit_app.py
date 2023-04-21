@@ -63,25 +63,27 @@ join['Destination Longitude'] = join['Destination Longitude'].dropna().astype(fl
 # Load the joined table
 routes = join.dropna()
 
-# Create a sidebar panel for airport selection
+import geopy.distance
+
+# create a sidebar panel for airport selection
 with st.sidebar:
-    # Add start and end airport selectors to the sidebar panel
+    # add start and end airport selectors to the sidebar panel
     start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
     end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
-
-    # Get the Source and Destination Airport ID
-    start_airport_id = airports[airports['Name'] == start_airport]['Airport ID'].values[0]
-    end_airport_id = airports[airports['Name'] == end_airport]['Airport ID'].values[0]
-
-    # Check if there is a direct route between the selected airports
-    if len(routes[(routes['Source airport ID'] == start_airport_id) & (routes['Destination airport ID'] == end_airport_id)]) == 0:
-        st.warning("There is no direct route between the selected airports.")
-        st.stop()
-
-    # Get latitude and longitude of start and end airports
+    
+    # get latitude and longitude of start and end airports
     start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
     end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
+    # calculate distance between the two airports
+    distance = geopy.distance.distance((start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)).km
+    st.write(f"Distance between {start_airport} and {end_airport}: {distance:.2f} km")
+
+    # check if there is a route between the two airports
+    if distance < 20000: # adjust this threshold as needed
+        st.write("There is a route between the two airports.")
+    else:
+        st.write("There is no route between the two airports.")
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
