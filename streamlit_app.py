@@ -112,22 +112,26 @@ st.write(f"Flight time: {flight_time:.2f} hours")
 
 
 
+# Merge the routes dataset with the airports dataset on 'Source airport ID'
+routes = routes.merge(airports[['Airport ID', 'City', 'Country']], left_on='Source airport ID', right_on='Airport ID', suffixes=('_source', '_dest'))
+# Drop the 'Airport ID' column which was added in the previous merge
+routes.drop('Airport ID', axis=1, inplace=True)
+# Merge the routes dataset with the airports dataset again on 'Destination airport ID'
+routes = routes.merge(airports[['Airport ID', 'City', 'Country']], left_on='Destination airport ID', right_on='Airport ID', suffixes=('_source', '_dest'))
+# Drop the 'Airport ID' column which was added in the previous merge
+routes.drop('Airport ID', axis=1, inplace=True)
 
-# Join the two tables based on the airport id columns
-routes = routes.merge(airports[['Airport ID', 'IATA']], left_on='Source airport ID', right_on='Airport ID')
-routes.rename(columns={'IATA': 'Source Airport Code'}, inplace=True)
-routes = routes.merge(airports[['Airport ID', 'IATA']], left_on='Destination airport ID', right_on='Airport ID')
-routes.rename(columns={'IATA': 'Destination Airport Code'}, inplace=True)
 
-# Define a function to find the airline and airline ID that has a route between the selected airports
-def find_route(start_airport, end_airport):
-    airline = routes[(routes['Source Airport Code'] == start_airport) & (routes['Destination Airport Code'] == end_airport)]['Airline'].tolist()
-    airline_id = routes[(routes['Source Airport Code'] == start_airport) & (routes['Destination Airport Code'] == end_airport)]['Airline ID'].tolist()
 
-    if len(airline) == 0:
-        st.write("There is no route between the selected airports.")
-    else:
-        st.write(f"The airline that has a route between the selected airports is {airline[0]} with an airline ID of {airline_id[0]}")
+# # Define a function to find the airline and airline ID that has a route between the selected airports
+# def find_route(start_airport, end_airport):
+#     airline = routes[(routes['Source Airport Code'] == start_airport) & (routes['Destination Airport Code'] == end_airport)]['Airline'].tolist()
+#     airline_id = routes[(routes['Source Airport Code'] == start_airport) & (routes['Destination Airport Code'] == end_airport)]['Airline ID'].tolist()
+
+#     if len(airline) == 0:
+#         st.write("There is no route between the selected airports.")
+#     else:
+#         st.write(f"The airline that has a route between the selected airports is {airline[0]} with an airline ID of {airline_id[0]}")
 
 
 
