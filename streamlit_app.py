@@ -39,6 +39,8 @@ st.write("Flight time calculator:")
 
 
 
+# Remove routes with missing source or destination airport ID
+routes = routes.dropna(subset=['Source airport ID', 'Destination airport ID'])
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
@@ -66,43 +68,51 @@ with st.sidebar:
     start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
     end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
-    # search for route between the two selected airports by their ID
-    route = routes[(routes['Source airport ID'] == start_airport_lat) & (routes['Destination airport ID'] == end_airport_lat)]
-    
-    # if route is not found, display error message
-    if route.empty:
-        st.error('No route found between selected airports!')
-    else:
-        # add markers to map for start and end airports
-        folium.Marker(
-            location=[start_airport_lat, start_airport_lon],
-            icon=folium.Icon(color='green'),
-            tooltip=start_airport
-        ).add_to(m)
 
-        folium.Marker(
-            location=[end_airport_lat, end_airport_lon],
-            icon=folium.Icon(color='red'),
-            tooltip=end_airport
-        ).add_to(m)
+folium.Marker(
+    location=[start_airport_lat, start_airport_lon],
+    icon=folium.Icon(color='green'),
+    tooltip=start_airport
+).add_to(m)
 
-        # add curved line to show flight path
-        coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
-        flight_path = folium.PolyLine(
-            locations=coords,
-            color='blue',
-            weight=3,
-            opacity=0.7,
-            smooth_factor=1
-        ).add_to(m)
+folium.Marker(
+    location=[end_airport_lat, end_airport_lon],
+    icon=folium.Icon(color='red'),
+    tooltip=end_airport
+).add_to(m)
 
-        # calculate flight time
-        distance = route['Distance'].values[0] # use the distance from the route table
-        speed = 800 # average speed of a commercial airliner in km/h
-        flight_time = distance / speed
 
-        st.write(f"Flight distance: {distance:.2f} km")
-        st.write(f"Flight time: {flight_time:.2f} hours")
+
+
+
+# add curved line to show flight path
+coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
+flight_path = folium.PolyLine(
+    locations=coords,
+    color='blue',
+    weight=3,
+    opacity=0.7,
+    smooth_factor=1
+).add_to(m)
+
+# calculate flight time
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6372.8 # Earth radius in kilometers
+    dLat = radians(lat2 - lat1)
+    dLon = radians(lon2 - lon1)
+    lat1 = radians(lat1)
+    lat2 = radians(lat2)
+    a = sin(dLat/2)**2 + cos(lat1)*cos(lat2)*sin(dLon/2)**2
+    c = 2*asin(sqrt(a))
+    return R * c
+
+distance = haversine(start_airport_lat, start_airport_lon, end_airport_lat, end_airport_lon)
+speed = 800 # average speed of a commercial airliner in km/h
+flight_time = distance / speed
+
+st.write(f"Flight distance: {distance:.2f} km")
+st.write(f"Flight time: {flight_time:.2f} hours")
+
 
 # display the map
 folium_static(m)
