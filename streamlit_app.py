@@ -107,6 +107,34 @@ flight_time = distance / speed
 st.write(f"Flight distance: {distance:.2f} km")
 st.write(f"Flight time: {flight_time:.2f} hours")
 
+
+
+
+
+
+
+# Join the two tables based on the airport id columns
+routes = routes.merge(airports[['Airport ID', 'IATA']], left_on='Source airport ID', right_on='Airport ID')
+routes.rename(columns={'IATA': 'Source Airport Code'}, inplace=True)
+routes = routes.merge(airports[['Airport ID', 'IATA']], left_on='Destination airport ID', right_on='Airport ID')
+routes.rename(columns={'IATA': 'Destination Airport Code'}, inplace=True)
+
+# Define a function to find the airline and airline ID that has a route between the selected airports
+def find_route(start_airport, end_airport):
+    airline = routes[(routes['Source Airport Code'] == start_airport) & (routes['Destination Airport Code'] == end_airport)]['Airline'].tolist()
+    airline_id = routes[(routes['Source Airport Code'] == start_airport) & (routes['Destination Airport Code'] == end_airport)]['Airline ID'].tolist()
+
+    if len(airline) == 0:
+        st.write("There is no route between the selected airports.")
+    else:
+        st.write(f"The airline that has a route between the selected airports is {airline[0]} with an airline ID of {airline_id[0]}")
+
+
+
+
+
+
+
 # display the map
 folium_static(m)
 
@@ -115,22 +143,22 @@ folium_static(m)
 
 
 
-# calculate airports per country
-airports_per_country = airports.groupby('Country')['Name'].count()
+# # calculate airports per country
+# airports_per_country = airports.groupby('Country')['Name'].count()
 
-# calculate airports per city
-airports_per_city = airports.groupby(['Country', 'City'])['Name'].count()
+# # calculate airports per city
+# airports_per_city = airports.groupby(['Country', 'City'])['Name'].count()
 
-# create a bar chart showing airports per country
-fig1, ax1 = plt.subplots()
-ax1.bar(airports_per_country.index, airports_per_country.values)
-ax1.set_xticklabels(airports_per_country.index, rotation=90)
-ax1.set_title('Airports per Country')
-st.pyplot(fig1)
+# # create a bar chart showing airports per country
+# fig1, ax1 = plt.subplots()
+# ax1.bar(airports_per_country.index, airports_per_country.values)
+# ax1.set_xticklabels(airports_per_country.index, rotation=90)
+# ax1.set_title('Airports per Country')
+# st.pyplot(fig1)
 
-# create a bar chart showing airports per city
-fig2, ax2 = plt.subplots()
-ax2.bar(airports_per_city.index.get_level_values('City'), airports_per_city.values)
-ax2.set_xticklabels(airports_per_city.index.get_level_values('City'), rotation=90)
-ax2.set_title('Airports per City')
-st.pyplot(fig2)
+# # create a bar chart showing airports per city
+# fig2, ax2 = plt.subplots()
+# ax2.bar(airports_per_city.index.get_level_values('City'), airports_per_city.values)
+# ax2.set_xticklabels(airports_per_city.index.get_level_values('City'), rotation=90)
+# ax2.set_title('Airports per City')
+# st.pyplot(fig2)
