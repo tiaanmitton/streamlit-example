@@ -51,14 +51,17 @@ with st.sidebar:
     
     # check if there is a direct route between the selected airports
     route_exists = False
+    start_airport_id = airports[airports['Name'] == start_airport]['Airport ID'].values[0]
+    end_airport_id = airports[airports['Name'] == end_airport]['Airport ID'].values[0]
     for index, row in routes.iterrows():
-        if row['Source airport ID'] == start_airport.index[0] and row['Destination airport ID'] == end_airport.index[0]:
+        if row['Source airport ID'] == start_airport_id and row['Destination airport ID'] == end_airport_id:
             route_exists = True
             break
     
     if not route_exists:
         st.warning("There is no direct route between the selected airports.")
         st.stop()
+
 
 
 # create a map centered on Africa
