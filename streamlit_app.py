@@ -62,8 +62,6 @@ with st.sidebar:
         st.warning("There is no direct route between the selected airports.")
         st.stop()
 
-
-
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
