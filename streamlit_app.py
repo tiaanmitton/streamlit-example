@@ -52,13 +52,14 @@ with st.sidebar:
     # check if there is a direct route between the selected airports
     route_exists = False
     for index, row in routes.iterrows():
-        if row['Source airport ID'] == start_airport_id and row['Destination airport ID'] == end_airport_id:
+        if row['Source airport ID'] == start_airport.index[0] and row['Destination airport ID'] == end_airport.index[0]:
             route_exists = True
             break
     
     if not route_exists:
         st.warning("There is no direct route between the selected airports.")
         st.stop()
+
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
