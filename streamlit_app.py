@@ -39,28 +39,49 @@ st.write("Flight time calculator:")
 
 
 
-# create a sidebar panel for airport selection
+# Convert the Airport ID's to string for the join
+airports['Airport ID'] = airports['Airport ID'].astype(str)
+routes['Source airport ID'] = routes['Source airport ID'].astype(str)
+routes['Destination airport ID'] = routes['Destination airport ID'].astype(str)
+
+# Join the airports table twice to the routes table
+source_airport_info = airports[['Airport ID', 'Latitude', 'Longitude']]
+source_airport_info.columns = ['Source airport ID', 'Source Latitude', 'Source Longitude']
+
+destination_airport_info = airports[['Airport ID', 'Latitude', 'Longitude']]
+destination_airport_info.columns = ['Destination airport ID', 'Destination Latitude', 'Destination Longitude']
+
+joined_table = pd.merge(routes, source_airport_info, on='Source airport ID', how='left')
+join = pd.merge(joined_table, destination_airport_info, on='Destination airport ID', how='left')
+
+# Clean the latitude data
+join['Source Latitude'] = join['Source Latitude'].dropna().astype(float)
+join['Source Longitude'] = join['Source Longitude'].dropna().astype(float)
+join['Destination Latitude'] = join['Destination Latitude'].dropna().astype(float)
+join['Destination Longitude'] = join['Destination Longitude'].dropna().astype(float)
+
+# Load the joined table
+routes = join.dropna()
+
+# Create a sidebar panel for airport selection
 with st.sidebar:
-    # add start and end airport selectors to the sidebar panel
+    # Add start and end airport selectors to the sidebar panel
     start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
     end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
-    
-    # get latitude and longitude of start and end airports
-    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
-    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
-    
-    # check if there is a direct route between the selected airports
-    route_exists = False
+
+    # Get the Source and Destination Airport ID
     start_airport_id = airports[airports['Name'] == start_airport]['Airport ID'].values[0]
     end_airport_id = airports[airports['Name'] == end_airport]['Airport ID'].values[0]
-    for index, row in routes.iterrows():
-        if row['Source airport ID'] == start_airport_id and row['Destination airport ID'] == end_airport_id:
-            route_exists = True
-            break
-    
-    if not route_exists:
+
+    # Check if there is a direct route between the selected airports
+    if len(routes[(routes['Source airport ID'] == start_airport_id) & (routes['Destination airport ID'] == end_airport_id)]) == 0:
         st.warning("There is no direct route between the selected airports.")
         st.stop()
+
+    # Get latitude and longitude of start and end airports
+    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
+
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
