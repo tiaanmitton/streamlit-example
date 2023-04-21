@@ -118,7 +118,13 @@ flight_path = folium.PolyLine(
     smooth_factor=1
 ).add_to(m)
 
-
+# create altitude chart
+altitude_data = pd.DataFrame({'Airport': [start_airport, end_airport], 'Altitude': [start_altitude, end_altitude]})
+altitude_chart = alt.Chart(altitude_data).mark_line().encode(
+    x='Airport',
+    y='Altitude'
+).properties(title=f"Altitude Change between {start_airport} and {end_airport}")
+st.altair_chart(altitude_chart, use_container_width=True)
 
 # calculate flight time
 def haversine(lat1, lon1, lat2, lon2):
@@ -141,13 +147,7 @@ st.write(f"Flight time: {flight_time:.2f} hours")
 # display the map
 folium_static(m)
 
-# create altitude chart
-altitude_data = pd.DataFrame({'Airport': [start_airport, end_airport], 'Altitude': [start_altitude, end_altitude]})
-altitude_chart = alt.Chart(altitude_data).mark_line().encode(
-    x='Airport',
-    y='Altitude'
-).properties(title=f"Altitude Change between {start_airport} and {end_airport}")
-st.altair_chart(altitude_chart, use_container_width=True)
+
 
 
 
