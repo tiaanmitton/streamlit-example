@@ -39,8 +39,26 @@ st.write("Flight time calculator:")
 
 
 
-# Remove routes with missing source or destination airport ID
-routes = routes.dropna(subset=['Source airport ID', 'Destination airport ID'])
+# create a sidebar panel for airport selection
+with st.sidebar:
+    # add start and end airport selectors to the sidebar panel
+    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
+    
+    # get latitude and longitude of start and end airports
+    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
+    
+    # check if there is a direct route between the selected airports
+    route_exists = False
+    for index, row in routes.iterrows():
+        if row['Source airport ID'] == start_airport_id and row['Destination airport ID'] == end_airport_id:
+            route_exists = True
+            break
+    
+    if not route_exists:
+        st.warning("There is no direct route between the selected airports.")
+        st.stop()
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
@@ -58,15 +76,6 @@ select_layer = st.sidebar.selectbox("Select a map style", list(tile_layers.keys(
 # Set the selected layer as the active layer
 tile_layers[select_layer].add_to(m)
 
-# create a sidebar panel for airport selection
-with st.sidebar:
-    # add start and end airport selectors to the sidebar panel
-    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
-    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
-    
-    # get latitude and longitude of start and end airports
-    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
-    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
 
 folium.Marker(
