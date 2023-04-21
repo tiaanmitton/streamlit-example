@@ -64,6 +64,8 @@ routes = join.dropna()
 
 import geopy.distance
 
+from elevations import elevation
+
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
@@ -90,7 +92,7 @@ with st.sidebar:
     start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
     end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
-
+# add start and end markers to the map
 folium.Marker(
     location=[start_airport_lat, start_airport_lon],
     icon=folium.Icon(color='green'),
@@ -103,7 +105,18 @@ folium.Marker(
     tooltip=end_airport
 ).add_to(m)
 
-# add curved line to show flight path
+# get the elevation profile for the flight path
+path = elevation([(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)])
+elevations = [p[2] for p in path]
+
+# plot the altitude profile using matplotlib
+fig, ax = plt.subplots()
+ax.plot(elevations)
+ax.set_xlabel('Distance (km)')
+ax.set_ylabel('Altitude (m)')
+st.pyplot(fig)
+
+# add curved line to show flight path on the map
 coords = [(start_airport_lat, start_airport_lon), (end_airport_lat, end_airport_lon)]
 flight_path = folium.PolyLine(
     locations=coords,
