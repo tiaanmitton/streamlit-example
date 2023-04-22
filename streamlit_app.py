@@ -157,21 +157,24 @@ folium_static(m)
 
 
 
-# Sort airports by altitude
-airports = airports.sort_values('Altitude', ascending=False)
+# Sort the airports based on altitude
+airports = airports.sort_values(by=['Altitude'], ascending=False)
 
-# Create a bar chart using Altair
-chart = alt.Chart(airports).mark_bar().encode(
-    x=alt.X('Altitude:Q', title='Altitude'),
-    y=alt.Y('Name:N', title='Airport'),
-    color=alt.condition(
-        alt.datum.Altitude < airports['Altitude'].quantile(0.05),
-        alt.value('blue'), alt.value('red')
-    )
+# Create the bar chart
+highest_altitudes = alt.Chart(airports.head(5)).mark_bar(color='red').encode(
+    x=alt.X('Altitude', title='Altitude'),
+    y=alt.Y('Name', sort='-x'),
+    tooltip=['Name', 'Altitude']
 ).properties(
-    width=800,
-    height=500
+    title='Top 5 Airports with the Highest Altitudes'
 )
 
-# Display the chart using Streamlit
-st.altair_chart(chart)
+lowest_altitudes = alt.Chart(airports.tail(5)).mark_bar(color='blue').encode(
+    x=alt.X('Altitude', title='Altitude'),
+    y=alt.Y('Name', sort='-x'),
+    tooltip=['Name', 'Altitude']
+).properties(
+    title='Top 5 Airports with the Lowest Altitudes'
+)
+
+st.write(highest_altitudes | lowest_altitudes)
