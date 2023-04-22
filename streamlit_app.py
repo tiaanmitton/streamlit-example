@@ -69,8 +69,9 @@ m = folium.Map(location=[0, 20], zoom_start=2)
 
 # create a sidebar panel for airport selection
 with st.sidebar:
-    start_airport = st.selectbox('Select a Departure Airport', airports['Name'], index=airports[airports['Name'] == 'OR Tambo International Airport'].index[0], value='OR Tambo International Airport')
-    end_airport = st.selectbox('Select a Destination Airport', airports['Name'], index=airports[airports['Name'] == 'Cape Town International Airport'].index[0], default='Cape Town International Airport')
+    # add start and end airport selectors to the sidebar panel
+    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
 
     # get latitude and longitude of start and end airports
     start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
@@ -129,6 +130,7 @@ flight_path = folium.PolyLine(
     opacity=0.7,
     smooth_factor=1
 ).add_to(m)
+
 
 
 # calculate flight time
