@@ -67,6 +67,35 @@ import geopy.distance
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
 
+# create a sidebar panel for airport selection
+with st.sidebar:
+    # add start and end airport selectors to the sidebar panel
+    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
+    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
+
+    # get latitude and longitude of start and end airports
+    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
+    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
+
+# create a list of airport coordinates to calculate the map bounds
+airport_coords = [
+    (start_airport_lat, start_airport_lon),
+    (end_airport_lat, end_airport_lon)
+]
+
+# get the maximum and minimum latitude and longitude values
+min_lat, min_lon = min(airport_coords)
+max_lat, max_lon = max(airport_coords)
+
+# calculate the center of the map
+center_lat, center_lon = (min_lat + max_lat) / 2, (min_lon + max_lon) / 2
+
+# calculate the zoom level to fit both airports on the map
+zoom = int(min(8, 1.5 / max(abs(max_lat - min_lat), abs(max_lon - min_lon))) + 2)
+
+# create the map with the calculated center and zoom level
+m = folium.Map(location=[center_lat, center_lon], zoom_start=zoom)
+
 # Add a dropdown to select map tiles
 tile_layers = {
     "OpenStreetMap": folium.TileLayer(),
@@ -79,17 +108,6 @@ select_layer = st.sidebar.selectbox("Select a map style", list(tile_layers.keys(
 
 # Set the selected layer as the active layer
 tile_layers[select_layer].add_to(m)
-
-# create a sidebar panel for airport selection
-with st.sidebar:
-    # add start and end airport selectors to the sidebar panel
-    start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
-    end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
-    
-    # get latitude and longitude of start and end airports
-    start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
-    end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
-
 
 folium.Marker(
     location=[start_airport_lat, start_airport_lon],
@@ -112,6 +130,7 @@ flight_path = folium.PolyLine(
     opacity=0.7,
     smooth_factor=1
 ).add_to(m)
+
 
 # calculate flight time
 def haversine(lat1, lon1, lat2, lon2):
