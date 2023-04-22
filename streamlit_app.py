@@ -5,7 +5,7 @@ import streamlit as st
 from streamlit_folium import folium_static
 from math import radians, cos, sin, asin, sqrt
 import matplotlib.pyplot as plt
-
+import altair as alt
 
 
 
@@ -154,3 +154,24 @@ st.write(f"Flight time: {flight_time:.2f} hours")
 # display the map
 folium_static(m)
 
+
+
+
+# Sort airports by altitude
+airports = airports.sort_values('Altitude', ascending=False)
+
+# Create a bar chart using Altair
+chart = alt.Chart(airports).mark_bar().encode(
+    x=alt.X('Altitude:Q', title='Altitude'),
+    y=alt.Y('Name:N', title='Airport'),
+    color=alt.condition(
+        alt.datum.Altitude < airports['Altitude'].quantile(0.05),
+        alt.value('blue'), alt.value('red')
+    )
+).properties(
+    width=800,
+    height=500
+)
+
+# Display the chart using Streamlit
+st.altair_chart(chart)
