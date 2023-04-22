@@ -5,8 +5,7 @@ import streamlit as st
 from streamlit_folium import folium_static
 from math import radians, cos, sin, asin, sqrt
 import matplotlib.pyplot as plt
-import plotly.express as px
-import geopy.distance
+
 
 
 
@@ -63,7 +62,7 @@ join['Destination Longitude'] = join['Destination Longitude'].dropna().astype(fl
 # Load the joined table
 routes = join.dropna()
 
-
+import geopy.distance
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
@@ -87,15 +86,11 @@ with st.sidebar:
     start_airport = st.selectbox('Select a Departure Airport', airports['Name'])
     end_airport = st.selectbox('Select a Destination Airport', airports['Name'])
     
-    # get altitude of start and end airports
-    start_altitude = airports[airports['Name'] == start_airport]['Altitude'].values[0]
-    end_altitude = airports[airports['Name'] == end_airport]['Altitude'].values[0]
-    
     # get latitude and longitude of start and end airports
     start_airport_lat, start_airport_lon = airports[airports['Name'] == start_airport][['Latitude', 'Longitude']].values[0]
     end_airport_lat, end_airport_lon = airports[airports['Name'] == end_airport][['Latitude', 'Longitude']].values[0]
 
-# add markers for start and end airports
+
 folium.Marker(
     location=[start_airport_lat, start_airport_lon],
     icon=folium.Icon(color='green'),
@@ -118,14 +113,6 @@ flight_path = folium.PolyLine(
     smooth_factor=1
 ).add_to(m)
 
-# create altitude chart
-altitude_data = pd.DataFrame({'Airport': [start_airport, end_airport], 'Altitude': [start_altitude, end_altitude]})
-altitude_chart = alt.Chart(altitude_data).mark_line().encode(
-    x='Airport',
-    y='Altitude'
-).properties(title=f"Altitude Change between {start_airport} and {end_airport}")
-st.altair_chart(altitude_chart, use_container_width=True)
-
 # calculate flight time
 def haversine(lat1, lon1, lat2, lon2):
     R = 6372.8 # Earth radius in kilometers
@@ -146,9 +133,4 @@ st.write(f"Flight time: {flight_time:.2f} hours")
 
 # display the map
 folium_static(m)
-
-
-
-
-
 
