@@ -178,3 +178,23 @@ lowest_altitudes = alt.Chart(airports.tail(5)).mark_bar(color='blue').encode(
 )
 
 st.write(highest_altitudes | lowest_altitudes)
+
+
+
+
+# Count number of airports by country
+country_counts = airports.groupby("Country").size().reset_index(name="Count")
+country_counts = country_counts.sort_values(by="Count", ascending=False).head(5)
+
+# Create bar chart using Plotly Express
+fig = px.bar(
+    country_counts,
+    x="Country",
+    y="Count",
+    color="Country",
+    color_discrete_sequence=px.colors.qualitative.Pastel1,
+    title="Top 5 Countries with the Most Airports",
+)
+
+# Display chart in Streamlit
+st.plotly_chart(fig)
