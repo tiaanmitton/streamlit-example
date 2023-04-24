@@ -6,6 +6,8 @@ from streamlit_folium import folium_static
 from math import radians, cos, sin, asin, sqrt
 import matplotlib.pyplot as plt
 import altair as alt
+import plotly.express as px
+import geopy.distance
 
 
 
@@ -62,7 +64,9 @@ join['Destination Longitude'] = join['Destination Longitude'].dropna().astype(fl
 # Load the joined table
 routes = join.dropna()
 
-import geopy.distance
+
+
+
 
 # create a map centered on Africa
 m = folium.Map(location=[0, 20], zoom_start=2)
